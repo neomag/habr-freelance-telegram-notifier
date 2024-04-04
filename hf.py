@@ -5,8 +5,10 @@ import os.path
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
-path = os.getcwd()
-os.chdir(path)
+current_file = os.path.realpath(__file__)
+current_directory = os.path.dirname(current_file)
+
+os.chdir(current_directory)
 if os.path.isfile('.env'):
     print(".env file found, loading")
 else: 
