@@ -57,7 +57,8 @@ else:
 
 
 def telegram_sendmessage(message):
-   send_text = 'https://api.telegram.org/bot' + TOKEN + '/sendMessage?chat_id=' + str(chat_id) + '&parse_mode=Markdown&text=' + message
+   #send_text = 'https://api.telegram.org/bot' + TOKEN + '/sendMessage?chat_id=' + str(chat_id) + '&parse_mode=Markdown&text=' + message
+   send_text = f'https://api.telegram.org/bot{TOKEN}sendMessage?chat_id={str(chat_id)}&parse_mode=Markdown&text={message}'
    response = requests.get(send_text)
    return response.json()
 
