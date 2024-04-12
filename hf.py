@@ -28,9 +28,33 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
 base_file = './base.json'
 
 #get chat_id
-r=requests.get(f"https://api.telegram.org/bot{TOKEN}/getUpdates")
-js=json.loads(r.text)
-chat_id=js['result'][0]['message']['chat']['id']
+if os.path.isfile("chat_id"):
+    if os.path.getsize("chat_id") > 0:
+        print("chat_id found, loading")
+        with open("chat_id") as f:
+             chat_id=f.readline()
+             print(f'chat_id from file = {chat_id}')
+    else:
+        print("chat_id file is empty, it is recommended to delete it")         
+        exit()
+else:
+    print(f"chat_id file does not exists, trying https://api.telegram.org/bot{TOKEN}/getUpdates")
+    r=requests.get(f"https://api.telegram.org/bot{TOKEN}/getUpdates")
+    js=json.loads(r.text)
+    if r.status_code==200:
+        try:
+            chat_id=js['result'][0]['message']['from']['id']
+            with open("chat_id", 'w') as f:
+                print(f"chat_id={chat_id}")
+                f.write(str(chat_id))
+                f.close
+        except:
+            print('chat_id not found, try send some random msg to group')
+            exit()
+    else:
+        print(f"https://api.telegram.org/bot{TOKEN}/getUpdates  return non 200 code")
+        exit()
+
 
 def telegram_sendmessage(message):
    send_text = 'https://api.telegram.org/bot' + TOKEN + '/sendMessage?chat_id=' + str(chat_id) + '&parse_mode=Markdown&text=' + message
@@ -61,7 +85,7 @@ else:
     with open(base_file, 'w') as f:
         json.dump(base,f)
 
-#check for a new records
+#check for a new tasks
 for task, href in zip(tasks,hrefs):
     if href.find('a')['href'] not in base.keys():
         base[ href.find('a')['href'] ] = task
